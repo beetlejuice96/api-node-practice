@@ -8,6 +8,7 @@ services:
     environment:
       POSTGRES_PASSWORD: example
       POSTGRES_USER: postgres
+      POSTGRES_DB: nodejs-course
     ports:
       - 5432:5432
 
@@ -16,6 +17,18 @@ services:
     restart: always
     ports:
       - 8080:8080
+
+  api:
+    container_name: api
+    restart: always
+    build:
+      context: .
+      dockerfile: dockerfile
+    env_file: ./.env
+    ports:
+      - '4000:4000'
+    depends_on:
+      - db
   # pgadmin:
   #   container_name: pgadmin_container
   #   image: dpage/pgadmin4

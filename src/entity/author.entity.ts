@@ -19,9 +19,9 @@ export class Author {
   @Column()
   fullName!: string;
 
-  @Field({ nullable: true })
+  @Field(() => [Book], { nullable: true })
   @OneToMany(() => Book, (book) => book.author, { nullable: true })
-  books!: Book;
+  books!: Book[];
 
   @Field(() => String) // ya que cuando creemos un autor todavia no vamos a tener libros asociados a este.
   @CreateDateColumn({ type: "timestamp" })

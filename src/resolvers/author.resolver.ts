@@ -9,6 +9,7 @@ import {
 } from "type-graphql";
 import { Author } from "../entity/author.entity";
 import { getRepository, Repository } from "typeorm";
+
 @InputType()
 class AuthorInput {
   @Field()
@@ -57,7 +58,7 @@ export class AuthorResolver {
 
   @Query(() => [Author]) // con los brackets le estamos indicando que vamos a obtener un array
   async getAllAuthors(): Promise<Author[]> {
-    return await this.authorRepository.find();
+    return await this.authorRepository.find({ relations: ["Book"] });
   }
 
   @Query(() => Author)
