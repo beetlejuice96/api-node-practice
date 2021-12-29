@@ -25,7 +25,6 @@ class BookIdInput {
   @Field()
   id!: string;
 }
-
 @InputType()
 class BookUpdateInput {
   @Field(() => String, { nullable: true })
@@ -33,6 +32,15 @@ class BookUpdateInput {
 
   @Field(() => Number, { nullable: true })
   author?: number;
+}
+
+@InputType()
+class BookUpdateParsedInput {
+  @Field(() => String, { nullable: true })
+  title?: string;
+
+  @Field(() => Author, { nullable: true })
+  author?: Author;
 }
 
 @Resolver()
@@ -97,11 +105,36 @@ export class BookResolver {
     }
   }
 
-  // @Mutation(() => Book)
-  // async updateBook(
-  //   @Arg("bookId", () => BookIdInput) bookId: BookIdInput,
-  //   @Arg("input", () => BookUpdateInput) input: BookUpdateInput
-  // ): Promise<Book | undefined> {
+  @Mutation(() => Book)
+  async updateBook(
+    @Arg("bookId", () => BookIdInput) bookId: BookIdInput,
+    @Arg("input", () => BookUpdateInput) input: BookUpdateInput
+  ): Promise<Boolean> {
+    try {
+      await this.bookRepository.update(bookId.id, await this.parseInput(input));
+      return true;
+    } catch (error) {
+      throw new Error(error as string);
+    }
+  }
 
-  // }
+  private async parseInput(input: BookUpdateInput) {
+    try {
+      const _input: BookUpdateParsedInput = {};
+      if (input.title) {
+        _input.title = input.title;
+      }
+
+      if (input.author) {
+        const author = await this.authorRepository.findOne(input.author);
+        if (!author) {
+          throw new Error("Author does not exist");
+        }
+        _input.author = await this.authorRepository.findOne(input.author);
+      }
+      return _input;
+    } catch (error) {
+      throw new Error(error as string);
+    }
+  }
 }
