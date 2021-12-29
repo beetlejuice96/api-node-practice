@@ -105,13 +105,25 @@ export class BookResolver {
     }
   }
 
-  @Mutation(() => Book)
+  @Mutation(() => Boolean)
   async updateBook(
     @Arg("bookId", () => BookIdInput) bookId: BookIdInput,
     @Arg("input", () => BookUpdateInput) input: BookUpdateInput
   ): Promise<Boolean> {
     try {
       await this.bookRepository.update(bookId.id, await this.parseInput(input));
+      return true;
+    } catch (error) {
+      throw new Error(error as string);
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async detectBook(
+    @Arg("bookId", () => BookIdInput) bookId: BookIdInput
+  ): Boolean {
+    try {
+      await this.bookRepository.delete(bookId.id);
       return true;
     } catch (error) {
       throw new Error(error as string);
