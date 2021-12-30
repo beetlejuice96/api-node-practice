@@ -58,7 +58,7 @@ export class AuthorResolver {
 
   @Query(() => [Author]) // con los brackets le estamos indicando que vamos a obtener un array
   async getAllAuthors(): Promise<Author[]> {
-    return await this.authorRepository.find({ relations: ["Book"] });
+    return await this.authorRepository.find({ relations: ["books"] });
   }
 
   @Query(() => Author)

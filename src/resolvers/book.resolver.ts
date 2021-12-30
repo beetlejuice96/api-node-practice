@@ -23,7 +23,7 @@ class BookInput {
 @InputType()
 class BookIdInput {
   @Field()
-  id!: string;
+  id!: number;
 }
 @InputType()
 class BookUpdateInput {
@@ -119,9 +119,9 @@ export class BookResolver {
   }
 
   @Mutation(() => Boolean)
-  async detectBook(
+  async deleteBook(
     @Arg("bookId", () => BookIdInput) bookId: BookIdInput
-  ): Boolean {
+  ): Promise<Boolean> {
     try {
       await this.bookRepository.delete(bookId.id);
       return true;
