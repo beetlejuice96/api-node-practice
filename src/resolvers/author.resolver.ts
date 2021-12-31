@@ -9,6 +9,7 @@ import {
 } from "type-graphql";
 import { Author } from "../entity/author.entity";
 import { getRepository, Repository } from "typeorm";
+import { Length } from "class-validator";
 
 @InputType()
 class AuthorInput {
@@ -22,6 +23,7 @@ class AuthorUpdateInput {
   id!: number;
 
   @Field()
+  @Length(3, 64)
   fullName?: string;
 }
 
