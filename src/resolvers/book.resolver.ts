@@ -6,11 +6,14 @@ import {
   Field,
   Query,
   Args,
+  UseMiddleware,
+  Ctx,
 } from "type-graphql";
 import { getRepository, Repository } from "typeorm";
 import { Author } from "../entity/author.entity";
 import { Book } from "../entity/book.entity";
 import { Length } from "class-validator";
+import { IContext, IsAuth } from "../middleware/auth.middleware";
 
 @InputType()
 class BookInput {
@@ -58,7 +61,12 @@ export class BookResolver {
   }
 
   @Mutation(() => Book)
-  async createBook(@Arg("input", () => BookInput) input: BookInput) {
+  @UseMiddleware(IsAuth)
+  async createBook(
+    @Arg("input", () => BookInput) input: BookInput,
+    @Ctx() context: IContext
+  ) {
+    console.log(context.payload);
     try {
       const author: Author | undefined = await this.authorRepository.findOne(
         input.author
@@ -82,6 +90,7 @@ export class BookResolver {
   }
 
   @Query(() => [Book])
+  @UseMiddleware(IsAuth)
   async getAll(): Promise<Book[]> {
     try {
       return await this.bookRepository.find({ relations: ["author"] });

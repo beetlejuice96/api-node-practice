@@ -1,7 +1,7 @@
 import { MiddlewareFn } from "type-graphql";
 
 import { verify } from "jsonwebtoken";
-import { response, request } from "express";
+import { Response, Request } from "express";
 import { environment } from "../config/environment";
 
 export interface IContext {
@@ -10,9 +10,10 @@ export interface IContext {
   payload: { userId: string };
 }
 
-export const isAuth: MiddlewareFn<IContext> = ({ context }, next) => {
+export const IsAuth: MiddlewareFn<IContext> = ({ context }, next) => {
   try {
-    const bearerToken = context.req.headers.get("authorization");
+    //TODO: agregar la busqueda de usuario para poder verificar que verdaderamente exista el usuario antes de devolver un token.
+    const bearerToken = context.req.headers["authorization"];
     if (!bearerToken) {
       throw new Error("Unauthorized");
     }
