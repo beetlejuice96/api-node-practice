@@ -12,6 +12,8 @@ import { IsEmail, Length } from "class-validator";
 import { hash, compareSync } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { environment } from "../config/environment";
+import { EmailController } from "../controllers/email.controller";
+
 @InputType()
 class UserInput {
   @Field()
@@ -108,6 +110,29 @@ export class AuthResolver {
         userId: userFound.id,
         jwt: jwt,
       };
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
+  }
+
+  @Mutation(() => String)
+  async recoveryPass(
+    @Arg("email", () => String) email: String
+  ): Promise<String | undefined> {
+    try {
+      const userExists = await this.userRepository.findOne({
+        where: { email },
+      });
+
+      if (!userExists) {
+        const error = new Error();
+        error.message = "Email is not available";
+        throw error;
+      }
+
+      const sender = new EmailController();
+      sender.sendEmail(email as string);
+      return "email sent successfully, check your email!";
     } catch (error: any) {
       throw new Error(error.message);
     }

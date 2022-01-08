@@ -21,6 +21,10 @@ export class Book {
   @Column()
   title!: string;
 
+  @Field()
+  @Column()
+  isOnLoan!: boolean;
+
   @Field(() => Author)
   @ManyToOne(() => Author, (author) => author.books, { onDelete: "CASCADE" })
   author!: Author;

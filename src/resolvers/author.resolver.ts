@@ -6,10 +6,12 @@ import {
   Field,
   Query,
   Args,
+  UseMiddleware,
 } from "type-graphql";
 import { Author } from "../entity/author.entity";
 import { getRepository, Repository } from "typeorm";
 import { Length } from "class-validator";
+import { IsAuth } from "../middleware/auth.middleware";
 
 @InputType()
 class AuthorInput {
@@ -41,7 +43,9 @@ export class AuthorResolver {
     this.authorRepository = getRepository(Author);
   }
 
-  @Mutation(() => Author) // se encarga de guardar o generar datos en la bd. esta nos devuelve un objeto autor.
+  // se encarga de guardar o generar datos en la bd. esta nos devuelve un objeto autor.
+  @Mutation(() => Author)
+  @UseMiddleware(IsAuth)
   async createAuthor(
     @Arg("input", () => AuthorInput) input: AuthorInput
   ): Promise<Author | undefined> {
@@ -59,11 +63,13 @@ export class AuthorResolver {
   }
 
   @Query(() => [Author]) // con los brackets le estamos indicando que vamos a obtener un array
+  @UseMiddleware(IsAuth)
   async getAllAuthors(): Promise<Author[]> {
     return await this.authorRepository.find({ relations: ["books"] });
   }
 
   @Query(() => Author)
+  @UseMiddleware(IsAuth)
   async getOneAuthor(
     @Arg("input", () => AuthorIdInput) input: AuthorIdInput
   ): Promise<Author | undefined> {
@@ -81,6 +87,7 @@ export class AuthorResolver {
   }
 
   @Mutation(() => Author)
+  @UseMiddleware(IsAuth)
   async updateAuthor(
     @Arg("input", () => AuthorUpdateInput) input: AuthorUpdateInput
   ): Promise<Author | undefined> {
@@ -97,6 +104,7 @@ export class AuthorResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseMiddleware(IsAuth)
   async deleteOneAuthor(
     @Arg("input", () => AuthorIdInput) input: AuthorIdInput
   ): Promise<Boolean> {

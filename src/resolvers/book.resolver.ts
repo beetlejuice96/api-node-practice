@@ -82,7 +82,7 @@ export class BookResolver {
         author: author,
       });
       return await this.bookRepository.findOne(book.identifiers[0].id, {
-        relations: ["author","author.books"],
+        relations: ["author", "author.books"],
       });
     } catch (e: any) {
       throw new Error(e.message);
@@ -102,12 +102,13 @@ export class BookResolver {
   }
 
   @Query(() => Book)
+  @UseMiddleware(IsAuth)
   async getBookById(
     @Arg("input", () => BookIdInput) input: BookIdInput
   ): Promise<Book | undefined> {
     try {
       const book = await this.bookRepository.findOne(input.id, {
-        relations: ["author", "author.books"
+        relations: ["author", "author.books"],
       });
       if (!book) {
         const error = new Error();
@@ -121,6 +122,7 @@ export class BookResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseMiddleware(IsAuth)
   async updateBook(
     @Arg("bookId", () => BookIdInput) bookId: BookIdInput,
     @Arg("input", () => BookUpdateInput) input: BookUpdateInput
@@ -134,12 +136,13 @@ export class BookResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseMiddleware(IsAuth)
   async deleteBook(
     @Arg("bookId", () => BookIdInput) bookId: BookIdInput
   ): Promise<Boolean> {
     try {
       const result = await this.bookRepository.delete(bookId.id);
-      if (result.affected===0) throw new Error("Book does not exist");
+      if (result.affected === 0) throw new Error("Book does not exist");
       return true;
     } catch (error) {
       throw new Error(error as string);
@@ -163,6 +166,21 @@ export class BookResolver {
       return _input;
     } catch (error) {
       throw new Error(error as string);
+    }
+  }
+
+  ///informe "semanal"
+  //TODO: me faltaria agregar fecha(no creo).
+  @Query(() => [Book])
+  @UseMiddleware(IsAuth)
+  public async getBookNotOnLoan(): Promise<Book[]> {
+    try {
+      return await this.bookRepository.find({
+        relations: ["author", "author.books"],
+        where: { isOnLoan: false },
+      });
+    } catch (error: any) {
+      throw new Error(error);
     }
   }
 }

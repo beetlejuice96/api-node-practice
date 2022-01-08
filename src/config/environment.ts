@@ -10,4 +10,7 @@ export const environment = {
   DB_PASSWORD: process.env.DB_PASSWORD,
   DB_DATABASE: process.env.DB_DATABASE,
   JWT_SECRET: process.env.JWT_SECRET || "Default",
+  HOST: process.env.HOST,
+  USER: process.env.USER,
+  PASS: process.env.PASS,
 };
